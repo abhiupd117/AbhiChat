@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">AbhiChat</string>
+    <string name="button_already_have_account">Already have an Account</string>
+    <string name="create_account">Create Account</string>
+    <string name="welcome_to_abhichat">Welcome to AbhiChat</string>
+    <string name="Enter_your_name">Enter your name</string>
+    <string name="Enter_email_id">Enter your mail id</string>
+    <string name="create_password">Creat Password</string>
+
+    <string name="friend_fragment">Friend Fragment</string>
+    <string name="chat_fragment">Chat Fragment</string>
+    <string name="btn_message_send">Send</string>
+    <string name="image_not_captured">Image not captured</string>
+    <string name="sorry_failed_to_capture_photo">Sorry failde to capture photo</string>
+</resources>
