@@ -29,7 +29,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
+public class ChatsusersAdapter extends RecyclerView.Adapter<ChatsusersAdapter.ViewHolder> {
     public Context mcontext;
     private List<Users> mUser;
     Intent chatlog_intent;
@@ -40,7 +40,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
     String uId;
 
 
-    public UserAdapter(Context context, List<Users> mUser) {
+    public ChatsusersAdapter(Context context, List<Users> mUser) {
         this.mcontext = context;
         this.mUser = mUser;
     }
@@ -54,7 +54,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
         database=FirebaseDatabase.getInstance();
         myRef=database.getReference();
 
- return new UserAdapter.ViewHolder(view);
+        return new ChatsusersAdapter.ViewHolder(view);
     }
 
     @Override
@@ -62,6 +62,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
 
         final Users users=mUser.get(position);
         viewHolder.username.setText(users.getName());
+        Log.e("usernamechats",users.getName());
         Glide.with(mcontext).load(users.getImageurl()).into(viewHolder.profileimage);
         final  String recieverId=users.getId();
 
@@ -79,7 +80,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
                 chatlog_intent.putExtra("loggedUser",userID);
                 Log.e("user",selectedUser.getName());
 
-               // Toast.makeText(mcontext,"Selected user is = "+selectedUser.getId()+" username = "+selectedUser.getName(),Toast.LENGTH_LONG).show();
+                Toast.makeText(mcontext,"Selected user is = "+selectedUser.getId()+" username = "+selectedUser.getName(),Toast.LENGTH_LONG).show();
                 mcontext.startActivity(chatlog_intent);
             }
         });

@@ -12,4 +12,8 @@
     <string name="btn_message_send">Send</string>
     <string name="image_not_captured">Image not captured</string>
     <string name="sorry_failed_to_capture_photo">Sorry failde to capture photo</string>
+
+    <string name="title_activity_videoview">Videoview</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
 </resources>

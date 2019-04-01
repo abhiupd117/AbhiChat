@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.amandeep.abhichat.Adapter.ChatsusersAdapter;
 import com.amandeep.abhichat.Adapter.MessageAdapter;
 import com.amandeep.abhichat.Adapter.UserAdapter;
 import com.amandeep.abhichat.Model.Chat;
@@ -35,7 +36,7 @@ import java.util.List;
  */
 public class ChatListFragment extends Fragment {
     private RecyclerView recyclerView;
-    private UserAdapter userAdapter;
+    private ChatsusersAdapter chatsusersAdapter;
     LinearLayoutManager mLinearLayoutmanager;
     private List<Users> muser;
     FirebaseUser fuser;
@@ -46,8 +47,8 @@ public class ChatListFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view=inflater.inflate(R.layout.fragment_freindsfragment,container,false);
-        recyclerView=view.findViewById(R.id.user_list);
+        View view=inflater.inflate(R.layout.fragment_chat,container,false);
+        recyclerView=view.findViewById(R.id.users_chats_list);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         fuser=FirebaseAuth.getInstance().getCurrentUser();
@@ -60,6 +61,8 @@ public class ChatListFragment extends Fragment {
     private void readUser() {
         // final FirebaseUser firebaseUser= FirebaseAuth.getInstance().getCurrentUser();
         final DatabaseReference databaseReference= FirebaseDatabase.getInstance().getReference().child("User");
+        //FirebaseDatabase mDatabase = databaseReference.getDatabase();
+
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -71,17 +74,14 @@ public class ChatListFragment extends Fragment {
                     String userKey = dataSnapshot1.getKey();
                     user.setId(userKey);
                     if(!userKey.equals(fuser.getUid())){
-                        readMessage(fuser.getUid(),user); //checking if chat exist
+                       // muser.add(user);
+
+                        //readMessage(fuser.getUid(),user); //checking if chat exist
                         assert  user!=null;
                         assert  fuser != null;
                     }
                 }
-                userAdapter=new UserAdapter(getContext(),muser);
-                mLinearLayoutmanager = new LinearLayoutManager(getActivity());
-                mLinearLayoutmanager.setOrientation(LinearLayoutManager.VERTICAL);
 
-                recyclerView.setLayoutManager(mLinearLayoutmanager);
-                recyclerView.setAdapter(userAdapter);
             }
 
             @Override
@@ -89,6 +89,7 @@ public class ChatListFragment extends Fragment {
 
             }
         });
+
     }
     private void readMessage(final String myId, final Users user)
     {
@@ -99,18 +100,25 @@ public class ChatListFragment extends Fragment {
                 for (DataSnapshot snapshot:dataSnapshot.getChildren())
                 {
                     Chat chat = snapshot.getValue(Chat.class);
-                    if( chat.getReceiver() != null && chat.getReceiver() != null) {
-                        if (!chat.getReceiver().isEmpty() && !chat.getReceiver().isEmpty()) {
+                    if( chat.getReceiver() != null && !chat.getReceiver().isEmpty()) {
+                       // if (!chat.getReceiver().isEmpty() && !chat.getReceiver().isEmpty()) {
                             if (chat.getReceiver().equals(myId) && chat.getSender().equals(user.getId()) || chat.getReceiver().equals(user.getId()) && chat.getSender().equals(myId)) {
                                 Log.e("Add Chat","called");
                                 if(chat.getMessage() != null && !chat.getMessage().isEmpty()){
                                         muser.add(user);
+                                    Log.e("Added User",user.getName()+"");
                                         break;
                                 }
                             }
-                        }
+                       // }
                     }
                 }
+                Log.e("Added User size = ",muser.size()+"");
+                chatsusersAdapter=new ChatsusersAdapter(getContext(),muser);
+                mLinearLayoutmanager = new LinearLayoutManager(getActivity());
+                mLinearLayoutmanager.setOrientation(LinearLayoutManager.VERTICAL);
+                recyclerView.setLayoutManager(mLinearLayoutmanager);
+                recyclerView.setAdapter(chatsusersAdapter);
             }
 
             @Override

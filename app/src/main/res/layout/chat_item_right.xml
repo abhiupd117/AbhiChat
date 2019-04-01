@@ -22,10 +22,20 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
         android:text="hello"
-        android:textColor="#fff"
+        android:textColor="@color/white"
         android:padding="8dp"
         android:id="@+id/show_message"
         android:textSize="16dp"/>
+
+        <TextView
+            android:id="@+id/time_stamp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="35dp"
+            android:text="hh:mm"
+            android:layout_alignParentEnd="true"
+
+            android:textSize="15sp" />
 
 
     </RelativeLayout>

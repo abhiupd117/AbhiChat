@@ -4,6 +4,10 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
 
     <application
         android:allowBackup="true"
@@ -12,9 +16,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
-        <activity android:name=".ChatActivity"
-            android:windowSoftInputMode="adjustPan"/>
+        <activity android:name=".CropImage" />
+        <activity
+            android:name=".ChatActivity"
+            android:windowSoftInputMode="adjustPan" />
         <activity android:name=".AllUserFragmnt" />
         <activity android:name=".MainActivity">
             <intent-filter>
@@ -27,10 +32,10 @@
         <activity android:name=".UserLoginActivity" />
         <activity android:name=".StartActivity">
             <intent-filter>
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".VideoviewPly"></activity>
     </application>
 
 </manifest>

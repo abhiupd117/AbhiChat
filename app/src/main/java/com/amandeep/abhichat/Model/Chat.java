@@ -1,23 +1,57 @@
 package com.amandeep.abhichat.Model;
 
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.os.Parcel;
+import android.os.Parcelable;
+
 public class Chat {
-    public String sender;
-    public String receiver;
-    public String message;
+    private String sender;
+    private String receiver;
+    private String message=null;
+    private String  imageUrl=null;
+    private String videoUrl=null;
+    private String timestamp=null;
 
 
-    public Chat(String sender, String receiver, String message) {
+
+    private  Users users;
+
+
+
+    public Chat(String sender, String receiver, String message,String imageUrl,Users users,String videoUrl,String timestamp) {
         this.sender = sender;
         this.receiver = receiver;
         this.message = message;
+        this.imageUrl=imageUrl;
+        this.videoUrl=videoUrl;
+        this.timestamp=timestamp;
     }
-    public Chat(){
+    public Chat()
+    {
 
+    }
+
+    public String getMessage_img() {
+        return imageUrl;
+    }
+
+    public Users getUsers() {
+        return users;
+    }
+
+    public void setUsers(Users users) {
+        this.users = users;
+    }
+
+    public void setMessage_img(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 
     public String getSender() {
         return sender;
     }
+
 
     public void setSender(String sender) {
         this.sender = sender;
@@ -31,12 +65,33 @@ public class Chat {
         this.receiver = receiver;
     }
 
+    public String getVideoUrl() {
+        return videoUrl;
+    }
+
+    public void setVideoUrl(String videoUrl) {
+        this.videoUrl = videoUrl;
+    }
+
+    public String getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(String timestamp) {
+        this.timestamp = timestamp;
+    }
+
     public String getMessage() {
         return message;
     }
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    @Override
+    public String toString() {
+            return "Chat{" + "message=" + message + ", imageUrl=" + imageUrl  + ", message='" + message + '\'' + ", users=" + users + '}';
     }
 }
 

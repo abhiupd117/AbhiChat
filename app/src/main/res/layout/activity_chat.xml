@@ -9,11 +9,10 @@
     <RelativeLayout
         android:id="@+id/user_profile"
         android:layout_width="match_parent"
-        android:layout_height="61dp"
+        android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:layout_marginStart="0dp"
-        android:layout_marginTop="0dp"
+        android:layout_margin="10dp"
         android:background="@android:color/background_light"
         android:orientation="horizontal">
 
@@ -26,16 +25,10 @@
 
         <TextView
             android:id="@+id/usernme_for_chat"
-            android:layout_width="181dp"
-            android:layout_height="52dp"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentBottom="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginStart="92dp"
-            android:layout_marginLeft="15dp"
-            android:layout_marginEnd="110dp"
-            android:layout_marginRight="15dp"
-            android:layout_marginBottom="8dp"
+            android:layout_centerHorizontal="true"
             android:layout_toEndOf="@+id/profile_img"
             android:background="@android:color/background_light"
             android:gravity="center"
@@ -50,38 +43,34 @@
     <android.support.v7.widget.RecyclerView
         android:id="@+id/chat_view"
         android:layout_width="match_parent"
-        android:layout_height="452dp"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/chat_box_nd_btn"
         android:layout_below="@+id/user_profile"
-        android:background="@color/colorGreen" />
+        android:background="@color/white" />
 
     <LinearLayout
         android:id="@+id/chat_box_nd_btn"
         android:layout_width="match_parent"
-        android:layout_height="55dp"
-        android:layout_below="@id/chat_view"
-        android:layout_alignParentStart="true"
-        android:layout_marginStart="0dp"
-        android:layout_marginTop="0dp"
+        android:layout_height="wrap_content"
+
+        android:weightSum="1.0"
+        android:layout_alignParentBottom="true"
         android:orientation="horizontal">
 
-        <ImageButton
+        <ImageView
             android:id="@+id/btn_add_manymore"
-            android:layout_width="31dp"
-            android:layout_height="39dp"
-            android:layout_alignParentBottom="true"
-            android:layout_marginBottom="0dp"
-            tools:srcCompat="@android:drawable/ic_menu_add" />
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginTop="10dp"
+            android:src="@drawable/plus" />
 
         <EditText
             android:id="@+id/message_box"
-            android:layout_width="269dp"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="54dp"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentBottom="true"
             android:layout_marginTop="0dp"
             android:layout_marginBottom="0dp"
-            android:layout_toStartOf="@+id/btn_add_manymore"
             android:ems="10"
             android:hint="Enter Message"
             android:inputType="textPersonName" />
@@ -89,13 +78,8 @@
 
         <Button
             android:id="@+id/btn_message_sent"
-            android:layout_width="71dp"
-            android:layout_height="60dp"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentBottom="true"
-            android:layout_marginTop="10dp"
-            android:layout_marginEnd="0dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:background="@drawable/button_shape"
             android:text="@string/btn_message_send" />
 
