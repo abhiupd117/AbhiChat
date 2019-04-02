@@ -15,6 +15,7 @@ import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -42,6 +43,8 @@ import com.amandeep.abhichat.AppUtils.Constant;
 import com.amandeep.abhichat.Model.Chat;
 import com.amandeep.abhichat.Model.Users;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -58,6 +61,7 @@ import com.google.firebase.storage.UploadTask;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.DateFormat;
@@ -100,6 +104,10 @@ public class ChatActivity extends AppCompatActivity {
     final int ACTIVITY_SELECT_IMAGE = 2;
     final int ACTIVITY_SELECT_VIDEO=3;
     ProgressBar progressBar;
+    private String mlatitude;
+    private String mLongitude;
+
+
     //ProgressDialog progressDialog;
 
 
@@ -110,7 +118,7 @@ public class ChatActivity extends AppCompatActivity {
     VideoView video_view_right;
 
 
-
+    int MY_PERMISSIONS_REQUEST_LOCATION = 3;
     String userId;
     MessageAdapter messageAdapter;
     private RecyclerView recyclerView;
@@ -127,6 +135,7 @@ public class ChatActivity extends AppCompatActivity {
 
         profileImage = findViewById(R.id.profile_img);
         username = findViewById(R.id.usernme_for_chat);
+        context = ChatActivity.this;
 
         message_write = findViewById(R.id.message_box);
         add_btn = findViewById(R.id.btn_add_manymore);
@@ -149,7 +158,7 @@ public class ChatActivity extends AppCompatActivity {
         userId = intent.getStringExtra("loggedUser");
         getPermission();
 
-        final GPSTracker gpsTracker= new GPSTracker(this);
+
 
 
 //        if (ContextCompat.checkSelfPermission(ChatActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
@@ -187,6 +196,8 @@ public class ChatActivity extends AppCompatActivity {
                 go_for_current_location.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        mCurrentPositionUsingGPS();
+
                     }
                 });
                 dialog.show();
@@ -327,6 +338,7 @@ public class ChatActivity extends AppCompatActivity {
                         final Uri image_video_Frame = getImageUri(getBaseContext(), bmframe);
 
                         //  store & retrieve this string to firebase
+                        //TODO SENDING VIDEO SNAPE IMAGE TO FIREBASE STORAGE
                         final StorageReference sframeRef = storageRef.child(Constant.IMAGES_MESSAGES + System.currentTimeMillis() + "." + getFileExtension(image_video_Frame));
                         UploadTask uploadTask_video_frame = sframeRef.putFile(image_video_Frame);
                         uploadTask_video_frame.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
@@ -540,24 +552,40 @@ public class ChatActivity extends AppCompatActivity {
 
 private void getPermission(){
         try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+            {
                 //do your check here
                 if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
                         == PackageManager.PERMISSION_GRANTED) {
                     Log.v(TAG,"Permission is granted");
                 } else {
                     Log.v(TAG,"Permission is revoked");
-                    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+                    ActivityCompat.requestPermissions(ChatActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
                 }
 
                 if (ContextCompat.checkSelfPermission(ChatActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                     Log.v(TAG, "Permission not granted");
-                    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 2);
+                    ActivityCompat.requestPermissions(ChatActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 2);
                     //File write logic here
                 }
                 else {
                     Toast.makeText(context, "READ permission alread", Toast.LENGTH_LONG).show();
                 }
+
+
+                if (ContextCompat.checkSelfPermission(ChatActivity.this,Manifest.permission.ACCESS_COARSE_LOCATION)
+                        != PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(ChatActivity.this,Manifest.permission.ACCESS_FINE_LOCATION)
+                        != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(ChatActivity.this,new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission.ACCESS_FINE_LOCATION},
+                            MY_PERMISSIONS_REQUEST_LOCATION);
+
+                    // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
+                    // app-defined int constant
+
+                    return;
+                }
+
+
             }
             else {
                     //permission is automatically granted on sdk<23 upon installation
@@ -569,6 +597,20 @@ private void getPermission(){
             e.printStackTrace();
         }
 }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+         if(requestCode==MY_PERMISSIONS_REQUEST_LOCATION){
+             if(grantResults[0]==PackageManager.PERMISSION_GRANTED){
+
+             }else{
+                 Toast.makeText(context,"Permission denied",Toast.LENGTH_SHORT).show();
+             }
+             return;
+         }
+    }
+
     public void choosePhotoFromGallary () {
 
         final CharSequence[] options = {"Images", "Videos", "Cancel"};
@@ -596,8 +638,87 @@ private void getPermission(){
     public void cropImagefromGallary(){
     }
 
+    //TODO GETTING CURRENT POSITION USING LATITUDE AND LONGITUDE
     private void mCurrentPositionUsingGPS(){
 
+
+        final GPSTracker gpsTracker= new GPSTracker(this);
+        if (gpsTracker.isGPSTrackingEnabled){
+
+            mlatitude=String.valueOf(gpsTracker.latitude);
+
+            mLongitude=String.valueOf(gpsTracker.longitude);
+
+            String mapImage_view=latlongtoGoogleMapApi(mlatitude,mLongitude);
+        }
+
     }
+
+    private String latlongtoGoogleMapApi(String setlat, String setLong){
+        String google_map_viewApi="https://maps.googleapis.com/maps/api/staticmap?center= " + setlat+ "," + setLong + "&zoom=13&siz" +
+                "e=600x300&maptype=roadmap&markers=color:blue%7Clabel:S%7C" +setlat + "," +setLong +"&key=AIzaSyANXJoo1l8XgxkvnBACcMY4entGGnFT8Q4";
+
+        return google_map_viewApi;
+    }
+
+
+    private  void getMapimage_file(String path){
+        Glide.with(this)
+                .asBitmap()
+                .load(path)
+                .into(new SimpleTarget<Bitmap>() {
+                    @Override
+                    public void onResourceReady(Bitmap resource, Transition<? super Bitmap> transition) {
+                       /* ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+                        resource.compress(Bitmap.CompressFormat.JPEG, 40, bytes);
+
+//you can create a new file name "test.jpg" in sdcard folder.
+                        File f = new File(Environment.getExternalStorageDirectory()
+                                + File.separator + "test.jpg");
+                        try {
+                            f.createNewFile();
+                            FileOutputStream fo = null;
+                            fo = new FileOutputStream(f);
+                            fo.write(bytes.toByteArray());
+                            fo.close();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }*/
+                        savemapView(resource);
+                    }
+
+                });
+    }
+    private void  savemapView(final Bitmap bitmap){
+
+
+        // TODO SENDING MAPVIEW IMAGE TO FIREBASE STORAGE
+
+        final StorageReference sframeRef = storageRef.child(Constant.IMAGES_MESSAGES + System.currentTimeMillis() + "." + getFileExtension(getImageUri(context,bitmap)));
+        UploadTask uploadTask_mapview = sframeRef.putFile(getImageUri(context,bitmap));
+        uploadTask_mapview.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+            @Override
+            public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                if (!task.isSuccessful()) {
+                    throw task.getException();
+                }
+                return sframeRef.getDownloadUrl();
+            }
+
+        }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+            @Override
+            public void onComplete(@NonNull Task<Uri> task) {
+                if (task.isSuccessful()) {
+                    Uri video_frame_url = task.getResult();
+                    System.out.println("uploaded" + video_frame_url);
+                    if (video_frame_url != null) {
+                        video_frame_url_for_uploade = video_frame_url.toString();
+                    }
+                }
+
+            }
+        });
+    }
+
 
 }

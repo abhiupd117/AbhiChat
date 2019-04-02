@@ -1,8 +1,8 @@
 <resources>
-    <string name="app_name">AbhiChat</string>
+    <string name="app_name">TSS Chat</string>
     <string name="button_already_have_account">Already have an Account</string>
     <string name="create_account">Create Account</string>
-    <string name="welcome_to_abhichat">Welcome to AbhiChat</string>
+    <string name="welcome_to_abhichat">Welcome to TSS Chat</string>
     <string name="Enter_your_name">Enter your name</string>
     <string name="Enter_email_id">Enter your mail id</string>
     <string name="create_password">Creat Password</string>
