@@ -74,9 +74,9 @@ public class ChatListFragment extends Fragment {
                     String userKey = dataSnapshot1.getKey();
                     user.setId(userKey);
                     if(!userKey.equals(fuser.getUid())){
-                       // muser.add(user);
+                     // muser.add(user);
 
-                        //readMessage(fuser.getUid(),user); //checking if chat exist
+                      // readMessage(fuser.getUid(),user); //checking if chat exist*/
                         assert  user!=null;
                         assert  fuser != null;
                     }
@@ -104,10 +104,13 @@ public class ChatListFragment extends Fragment {
                        // if (!chat.getReceiver().isEmpty() && !chat.getReceiver().isEmpty()) {
                             if (chat.getReceiver().equals(myId) && chat.getSender().equals(user.getId()) || chat.getReceiver().equals(user.getId()) && chat.getSender().equals(myId)) {
                                 Log.e("Add Chat","called");
-                                if(chat.getMessage() != null && !chat.getMessage().isEmpty()){
+                                if(chat.getMessage() != null && !chat.getMessage().isEmpty())
+                                {
+                                    if (chat.getMessage_img()!=null && !chat.getMessage_img().isEmpty() || chat.getTimestamp()!=null && chat.getTimestamp().isEmpty() ||chat .getLongitude()!=null && chat.getLongitude().isEmpty() || chat.getLat()!=null && chat.getLat().isEmpty()){
                                         muser.add(user);
-                                    Log.e("Added User",user.getName()+"");
+                                        Log.e("Added User",user.getName()+"");
                                         break;
+                                    }
                                 }
                             }
                        // }

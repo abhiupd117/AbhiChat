@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -15,6 +16,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -102,7 +104,7 @@ public class ChatActivity extends AppCompatActivity {
     StorageReference storageReference;
     private String imagemessgeUrl;
     ImageView gallary_image;
-    public final int TAKE_PICTURE_CAMERA = 1;
+    public final int TAKE_PICTURE_CAMERA = 6;
     final int ACTIVITY_SELECT_IMAGE = 2;
     final int ACTIVITY_SELECT_VIDEO=3;
     ProgressBar progressBar;
@@ -254,24 +256,7 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
 
-        reference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-                Users users = dataSnapshot.getValue(Users.class);
-                //username.setText(users.getName());
-
-//                Glide.with(context).load(users.getImage_url()).into(profileImage);
-
-                readMessage(userId, selectedUser.getId(), users.getImageurl());
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-
+        new readinguserfromDB().execute();
 
     }
 
@@ -308,7 +293,8 @@ public class ChatActivity extends AppCompatActivity {
 
                     final StorageReference sRef = storageRef.child(Constant.IMAGES_MESSAGES + System.currentTimeMillis() + "." + getFileExtension(selectedImage));
                     UploadTask uploadTask = sRef.putFile(selectedImage);
-                    uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+                    uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>()
+                    {
                         @Override
                         public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
                             if (!task.isSuccessful()) {
@@ -345,8 +331,7 @@ public class ChatActivity extends AppCompatActivity {
                         }
                     });
                 }
-                if (requestCode == ACTIVITY_SELECT_VIDEO)
-                {
+                if (requestCode == ACTIVITY_SELECT_VIDEO) {
                     selectedVideo = data.getData();
                     if (selectedVideo != null) {
 
@@ -424,7 +409,7 @@ public class ChatActivity extends AppCompatActivity {
                                     hashMap.put("sender", userId);
                                     hashMap.put("receiver", selectedUser.getId());
                                     hashMap.put("videoUrl", user_video_StringLink);
-                                    hashMap.put("timestamp",getTimeStamp());
+                                    hashMap.put("timestamp", getTimeStamp());
                                     hashMap.put("imageUrl", video_frame_url_for_uploade);
                                     reference.child("messages").push().setValue(hashMap);
                                     //  progressDialog.hide();
@@ -436,12 +421,61 @@ public class ChatActivity extends AppCompatActivity {
                             }
                         }
                     });
-
                 }
-                if (requestCode==TAKE_PICTURE_CAMERA){
+
+                if (requestCode==TAKE_PICTURE_CAMERA)
+                {
+
                         Bitmap thumbnail = (Bitmap) data.getExtras().get("data");
+                        selectedImage=getImageUri(context,thumbnail);
 
-                }
+
+                        if (selectedImage!=null) {
+
+                            final StorageReference sRef = storageRef.child(Constant.IMAGES_MESSAGES + System.currentTimeMillis() + "." + getFileExtension(selectedImage));
+                            UploadTask uploadTask = sRef.putFile(selectedImage);
+                            uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+                                @Override
+                                public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                                    if (!task.isSuccessful()) {
+
+                                        throw task.getException();
+                                    }
+                                    return sRef.getDownloadUrl();
+
+                                }
+                            }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Uri> task) {
+
+                                    if (task.isSuccessful()) {
+                                        Uri downlodeUri = task.getResult();
+                                        System.out.println("Uploaded" + downlodeUri);
+                                        if (downlodeUri != null) {
+                                            userPhotoStringLink = downlodeUri.toString();
+                                            Log.e(" image url", userPhotoStringLink);
+                                            reference = FirebaseDatabase.getInstance().getReference();
+                                            Log.e("send image Chat", "called");
+                                            HashMap<String, Object> hashMap = new HashMap<>();
+                                            hashMap.put("sender", userId);
+                                            hashMap.put("receiver", selectedUser.getId());
+                                            hashMap.put("imageUrl", userPhotoStringLink);
+                                            hashMap.put("timestamp", getTimeStamp());
+                                            reference.child("messages").push().setValue(hashMap);
+
+
+                                        }
+                                    } else {
+                                        Log.d(TAG, "Something wrong with user photo String link which is comming from DB");
+                                    }
+                                }
+                            });
+                        }
+
+                    }
+
+
+
             }
 
 
@@ -602,14 +636,28 @@ private void getPermission(){
                     //File write logic here
                 }
                 else {
-                    Toast.makeText(context, "READ permission alread", Toast.LENGTH_LONG).show();
+                    //Toast.makeText(context, "READ permission alread", Toast.LENGTH_LONG).show();
+                }
+                if (ContextCompat.checkSelfPermission(ChatActivity.this,
+                        Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+
+                    if (ActivityCompat.shouldShowRequestPermissionRationale((Activity)
+                           ChatActivity.this, Manifest.permission.CAMERA)) {
+
+
+                    } else {
+                        ActivityCompat.requestPermissions((Activity) ChatActivity.this,
+                                new String[]{Manifest.permission.CAMERA},
+                                6);
+                    }
+
                 }
 
 
                 if (ContextCompat.checkSelfPermission(ChatActivity.this,Manifest.permission.ACCESS_COARSE_LOCATION)
                         != PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(ChatActivity.this,Manifest.permission.ACCESS_FINE_LOCATION)
                         != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(ChatActivity.this,new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission.ACCESS_FINE_LOCATION},
+                    ActivityCompat.requestPermissions(ChatActivity.this,new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission  .ACCESS_FINE_LOCATION},
                             MY_PERMISSIONS_REQUEST_LOCATION);
 
                     // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
@@ -811,7 +859,56 @@ private void getPermission(){
         });
     }
 
+    private class readinguserfromDB extends AsyncTask<String, Void, String> {
+
+        ProgressDialog progressDialog= new ProgressDialog(ChatActivity.this);
+
+        @Override
+        protected String doInBackground(String... params) {
 
 
+            reference.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
+                    Users users = dataSnapshot.getValue(Users.class);
+                    //username.setText(users.getName());
+
+//                Glide.with(context).load(users.getImage_url()).into(profileImage);
+
+                    readMessage(userId, selectedUser.getId(), users.getImageurl());
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+
+            return "";
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            // might want to change "executed" for the returned string passed
+            // into onPostExecute() but that is upto you
+          //  progressDialog.dismiss();
+          //  progressDialog = null;
+
+        }
+
+        @Override
+        protected void onPreExecute() {
+
+          //  progressDialog.setMessage("loading...");
+           // progressDialog.show();
+        }
+
+        @Override
+        protected void onProgressUpdate(Void... values) {}
+    }
 }
+
+
+
+

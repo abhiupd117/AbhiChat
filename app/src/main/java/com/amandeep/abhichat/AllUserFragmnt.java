@@ -45,7 +45,8 @@ public class AllUserFragmnt extends Fragment {
 
     }
 
-    private void readUser() {
+    private void readUser()
+    {
        // final FirebaseUser firebaseUser= FirebaseAuth.getInstance().getCurrentUser();
         final DatabaseReference databaseReference= FirebaseDatabase.getInstance().getReference().child("User");
         databaseReference.addValueEventListener(new ValueEventListener() {
