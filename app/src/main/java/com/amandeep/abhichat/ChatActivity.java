@@ -88,10 +88,10 @@ public class ChatActivity extends AppCompatActivity {
     CircleImageView profileImage;
     TextView username;
     //FirebaseUser fuser;
-    DatabaseReference reference;
+    static DatabaseReference reference;
     Intent intent;
     private FirebaseAuth firebaseAuth;
-    Context context;
+    public static Context context;
     ImageView add_btn;
     EditText message_write;
     Button btn_message_send;
@@ -108,8 +108,8 @@ public class ChatActivity extends AppCompatActivity {
     final int ACTIVITY_SELECT_IMAGE = 2;
     final int ACTIVITY_SELECT_VIDEO=3;
     ProgressBar progressBar;
-    private String mlatitude;
-    private String mLongitude;
+    private static String mlatitude;
+    private static String mLongitude;
 
 
     //ProgressDialog progressDialog;
@@ -117,22 +117,22 @@ public class ChatActivity extends AppCompatActivity {
 
     FirebaseStorage storage;
 
-    StorageReference storageRef;
+    static StorageReference storageRef;
     ImageView imageView;
     VideoView video_view_right;
 
 
     int MY_PERMISSIONS_REQUEST_LOCATION = 4;
-    String userId;
+    static String userId;
     MessageAdapter messageAdapter;
     private RecyclerView recyclerView;
-    private Users selectedUser;
+    private static Users selectedUser;
     private boolean isFirstTime = false;
      String userPhotoStringLink;
     Bitmap bmframe;
     private String video_frame_url_for_uploade;
-    private String mapview_url_for_uploade;
-    private  Uri mapView_Uri_from_drawable;
+    private static String mapview_url_for_uploade;
+    private static Uri mapView_Uri_from_drawable;
     private int REQUEST_CODE_CAPTURE_IMAGE=5;
 
     @Override
@@ -271,7 +271,7 @@ public class ChatActivity extends AppCompatActivity {
         reference.child("messages").push().setValue(hashMap);
 
     }
-    private String getTimeStamp(){
+    private static String getTimeStamp(){
         Long tsLong = System.currentTimeMillis()/1000;
         String ts = tsLong.toString();
         return ts;
@@ -487,7 +487,7 @@ public class ChatActivity extends AppCompatActivity {
 
 
 
-    private Uri getImageUri(Context context, Bitmap inImage) {
+    private static Uri getImageUri(Context context, Bitmap inImage) {
         Uri uri = null;
         if(inImage != null){
             ByteArrayOutputStream bytes = new ByteArrayOutputStream();
@@ -606,9 +606,9 @@ public class ChatActivity extends AppCompatActivity {
         });
     }
 
-    public String getFileExtension (Uri uri) {
+    public static String getFileExtension(Uri uri) {
         if (uri != null) {
-            ContentResolver cR = getContentResolver();
+            ContentResolver cR = context.getContentResolver();
             MimeTypeMap mime = MimeTypeMap.getSingleton();
             return mime.getExtensionFromMimeType(cR.getType(uri));
         } else {
@@ -736,7 +736,13 @@ private void getPermission(){
 
             /*String map_URL_Image_view=latlongtoGoogleMapApi(mlatitude,mLongitude);
             getMapimage_file(map_URL_Image_view);*/
-            mapviewImagetoStorage();
+           // mapviewImagetoStorage();
+            Intent intent = new Intent(this,MapViewActivity.class);
+            intent.putExtra("latitude",mlatitude);
+            intent.putExtra("longitude",mLongitude);
+            intent.putExtra("type","btn_click");
+
+            startActivity(intent);
         }
 
     }
@@ -776,7 +782,7 @@ private void getPermission(){
 
                 });
     }*/
-    private void  savemapView(final Bitmap bitmap){
+    public static void savemapView(final Bitmap bitmap){
 
 
         // TODO SENDING MAPVIEW IMAGE TO FIREBASE STORAGE
@@ -805,12 +811,13 @@ private void getPermission(){
                         HashMap<String, Object> hashMap = new HashMap<>();
                         hashMap.put("sender", userId);
                         hashMap.put("receiver", selectedUser.getId());
-                        hashMap.put("mapview", mapview_url_for_uploade);
+                        hashMap.put("imageUrl", mapview_url_for_uploade);
                         hashMap.put("timestamp",getTimeStamp());
                         hashMap.put("lat", mlatitude);
                         hashMap.put("longitude",mLongitude);
                         reference.child("messages").push().setValue(hashMap);                    }
                 }
+                Toast.makeText(context,"Your current location sent",Toast.LENGTH_LONG).show();
 
             }
         });
@@ -820,10 +827,10 @@ private void getPermission(){
 
 
 
-    private void mapviewImagetoStorage()
+    public static void mapviewImagetoStorage(Uri uri)
     {
-        final StorageReference sframeRef = storageRef.child(Constant.IMAGES_MESSAGES + System.currentTimeMillis() + "." + getFileExtension(mapView_Uri_from_drawable));
-        UploadTask uploadTask_mapview = sframeRef.putFile(mapView_Uri_from_drawable);
+        final StorageReference sframeRef = storageRef.child(Constant.IMAGES_MESSAGES + System.currentTimeMillis() + "." + getFileExtension(uri/*mapView_Uri_from_drawable*/));
+        UploadTask uploadTask_mapview = sframeRef.putFile(uri/*mapView_Uri_from_drawable*/);
         uploadTask_mapview.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
             @Override
             public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
@@ -851,7 +858,7 @@ private void getPermission(){
                         hashMap.put("lat", mlatitude);
                         hashMap.put("longitude", mLongitude);
                         reference.child("messages").push().setValue(hashMap);
-                        Toast.makeText(ChatActivity.this,"Your current location sent",Toast.LENGTH_LONG).show();
+                        Toast.makeText(context,"Your current location sent",Toast.LENGTH_LONG).show();
                     }
 
                 }
