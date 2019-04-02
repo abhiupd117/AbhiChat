@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -64,6 +65,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -127,11 +129,17 @@ public class ChatActivity extends AppCompatActivity {
      String userPhotoStringLink;
     Bitmap bmframe;
     private String video_frame_url_for_uploade;
+    private String mapview_url_for_uploade;
+    private  Uri mapView_Uri_from_drawable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
+
+         mapView_Uri_from_drawable = Uri.parse("android.resource://com.amandeep.abhichat/" + R.drawable.map_dummy);
+
+
 
         profileImage = findViewById(R.id.profile_img);
         username = findViewById(R.id.usernme_for_chat);
@@ -197,6 +205,9 @@ public class ChatActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View v) {
                         mCurrentPositionUsingGPS();
+                        dialog.dismiss();
+
+
 
                     }
                 });
@@ -649,7 +660,9 @@ private void getPermission(){
 
             mLongitude=String.valueOf(gpsTracker.longitude);
 
-            String mapImage_view=latlongtoGoogleMapApi(mlatitude,mLongitude);
+            /*String map_URL_Image_view=latlongtoGoogleMapApi(mlatitude,mLongitude);
+            getMapimage_file(map_URL_Image_view);*/
+            mapviewImagetoStorage();
         }
 
     }
@@ -662,14 +675,14 @@ private void getPermission(){
     }
 
 
-    private  void getMapimage_file(String path){
+    /*private  void getMapimage_file(String path){
         Glide.with(this)
                 .asBitmap()
                 .load(path)
                 .into(new SimpleTarget<Bitmap>() {
                     @Override
                     public void onResourceReady(Bitmap resource, Transition<? super Bitmap> transition) {
-                       /* ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+                       *//* ByteArrayOutputStream bytes = new ByteArrayOutputStream();
                         resource.compress(Bitmap.CompressFormat.JPEG, 40, bytes);
 
 //you can create a new file name "test.jpg" in sdcard folder.
@@ -683,12 +696,12 @@ private void getPermission(){
                             fo.close();
                         } catch (Exception e) {
                             e.printStackTrace();
-                        }*/
-                        savemapView(resource);
+                        }*//*
+                        //savemapView(resource);
                     }
 
                 });
-    }
+    }*/
     private void  savemapView(final Bitmap bitmap){
 
 
@@ -709,16 +722,70 @@ private void getPermission(){
             @Override
             public void onComplete(@NonNull Task<Uri> task) {
                 if (task.isSuccessful()) {
-                    Uri video_frame_url = task.getResult();
-                    System.out.println("uploaded" + video_frame_url);
-                    if (video_frame_url != null) {
-                        video_frame_url_for_uploade = video_frame_url.toString();
-                    }
+                    Uri map_view_Url = task.getResult();
+                    System.out.println("uploaded" + map_view_Url);
+                    if (map_view_Url != null) {
+                        mapview_url_for_uploade = map_view_Url.toString();
+                        reference = FirebaseDatabase.getInstance().getReference();
+                        Log.e("send video Chat", "called");
+                        HashMap<String, Object> hashMap = new HashMap<>();
+                        hashMap.put("sender", userId);
+                        hashMap.put("receiver", selectedUser.getId());
+                        hashMap.put("mapview", mapview_url_for_uploade);
+                        hashMap.put("timestamp",getTimeStamp());
+                        hashMap.put("lat", mlatitude);
+                        hashMap.put("long",mLongitude);
+                        reference.child("messages").push().setValue(hashMap);                    }
                 }
 
             }
         });
     }
+
+    //TODO DRAWABLE RESOURSE TO URI
+
+
+
+    private void mapviewImagetoStorage()
+    {
+        final StorageReference sframeRef = storageRef.child(Constant.IMAGES_MESSAGES + System.currentTimeMillis() + "." + getFileExtension(mapView_Uri_from_drawable));
+        UploadTask uploadTask_mapview = sframeRef.putFile(mapView_Uri_from_drawable);
+        uploadTask_mapview.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+            @Override
+            public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                if (!task.isSuccessful()) {
+                    throw task.getException();
+                }
+                return sframeRef.getDownloadUrl();
+            }
+
+        }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+            @Override
+            public void onComplete(@NonNull Task<Uri> task) {
+                if (task.isSuccessful()) {
+                    Uri map_view_Url = task.getResult();
+                    System.out.println("uploaded" + map_view_Url);
+                    if (map_view_Url != null) {
+                        mapview_url_for_uploade = map_view_Url.toString();
+                        reference = FirebaseDatabase.getInstance().getReference();
+                        Log.e("send video Chat", "called");
+                        HashMap<String, Object> hashMap = new HashMap<>();
+                        hashMap.put("sender", userId);
+                        hashMap.put("receiver", selectedUser.getId());
+                        hashMap.put("mapview", mapview_url_for_uploade);
+                        hashMap.put("timestamp", getTimeStamp());
+                        hashMap.put("lat", mlatitude);
+                        hashMap.put("long", mLongitude);
+                        reference.child("messages").push().setValue(hashMap);
+                        Toast.makeText(ChatActivity.this,"Your current location sent",Toast.LENGTH_LONG).show();
+                    }
+
+                }
+            }
+        });
+    }
+
+
 
 
 }
