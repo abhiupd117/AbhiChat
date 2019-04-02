@@ -2,6 +2,7 @@ package com.amandeep.abhichat.Adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -79,11 +80,11 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
         //  imageUrl=chat.getImagemessgae();
         if (chat.getMessage_img()!=null){
             Glide.with(mcontext).load(chat.getMessage_img()).apply(new RequestOptions().override(200,100)).fitCenter().into(viewHolder.image_messge);
-           viewHolder.mTimeStamp.setText(convertTimeStamp(chat.getTimestamp()));
+            viewHolder.mTimeStamp.setText(convertTimeStamp(chat.getTimestamp()));
         }
         if (chat.getMessage()!=null) {
             viewHolder.show_msg.setText(chat.getMessage());
-        viewHolder.mTimeStamp.setText(convertTimeStamp(chat.getTimestamp()));
+            viewHolder.mTimeStamp.setText(convertTimeStamp(chat.getTimestamp()));
 
         }
         if (chat.getVideoUrl()!=null){
@@ -91,8 +92,6 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
                 viewHolder.image_messge.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-
-
 
                         videoUrl=chat.getVideoUrl();
                         Log.d("snap",videoUrl);
@@ -114,7 +113,23 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
                     @Override
                     public void onClick(View v) {
                       //  Toast.makeText(mcontext, "i am pure image", Toast.LENGTH_LONG).show();
+                        if(chat.getLat()!=null && chat.getLongitude()!=null){
+                            Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse("http://maps.google.com/maps?q=loc:" + chat.getLat() + "," + chat.getLongitude()));
+                            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); // Only if initiating from a Broadcast Receiver
+                            String mapsPackageName = "com.google.android.apps.maps";
 
+                          //  if (Utility.isPackageExisted(mcontext, mapsPackageName)) {
+                                i.setClassName(mapsPackageName, "com.google.android.maps.MapsActivity");
+                                i.setPackage(mapsPackageName);
+                          //  }
+                            if(i.resolveActivity(mcontext.getPackageManager())!=null){
+                                mcontext.startActivity(i);
+                            }else{
+                                Toast.makeText(mcontext,"No Map application is installed",Toast.LENGTH_SHORT).show();
+                            }
+
+
+                        }
                     }
                 });
 

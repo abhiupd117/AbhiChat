@@ -102,7 +102,7 @@ public class ChatActivity extends AppCompatActivity {
     StorageReference storageReference;
     private String imagemessgeUrl;
     ImageView gallary_image;
-    public final int TAKE_PICTURE = 1;
+    public final int TAKE_PICTURE_CAMERA = 1;
     final int ACTIVITY_SELECT_IMAGE = 2;
     final int ACTIVITY_SELECT_VIDEO=3;
     ProgressBar progressBar;
@@ -120,7 +120,7 @@ public class ChatActivity extends AppCompatActivity {
     VideoView video_view_right;
 
 
-    int MY_PERMISSIONS_REQUEST_LOCATION = 3;
+    int MY_PERMISSIONS_REQUEST_LOCATION = 4;
     String userId;
     MessageAdapter messageAdapter;
     private RecyclerView recyclerView;
@@ -131,6 +131,7 @@ public class ChatActivity extends AppCompatActivity {
     private String video_frame_url_for_uploade;
     private String mapview_url_for_uploade;
     private  Uri mapView_Uri_from_drawable;
+    private int REQUEST_CODE_CAPTURE_IMAGE=5;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -209,6 +210,13 @@ public class ChatActivity extends AppCompatActivity {
 
 
 
+                    }
+                });
+                go_for_camera.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        takePhotoFromCamera();
+                        dialog.dismiss();
                     }
                 });
                 dialog.show();
@@ -291,7 +299,8 @@ public class ChatActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
             if (resultCode == Activity.RESULT_OK && data != null) {
-                if (requestCode == ACTIVITY_SELECT_IMAGE) {
+                if (requestCode == ACTIVITY_SELECT_IMAGE)
+                {
                     Bundle extras = data.getExtras();
 
                     selectedImage = data.getData();
@@ -336,7 +345,8 @@ public class ChatActivity extends AppCompatActivity {
                         }
                     });
                 }
-                if (requestCode == ACTIVITY_SELECT_VIDEO) {
+                if (requestCode == ACTIVITY_SELECT_VIDEO)
+                {
                     selectedVideo = data.getData();
                     if (selectedVideo != null) {
 
@@ -426,6 +436,10 @@ public class ChatActivity extends AppCompatActivity {
                             }
                         }
                     });
+
+                }
+                if (requestCode==TAKE_PICTURE_CAMERA){
+                        Bitmap thumbnail = (Bitmap) data.getExtras().get("data");
 
                 }
             }
@@ -521,6 +535,14 @@ public class ChatActivity extends AppCompatActivity {
                             String timestamp = (String) valuesInMap.get("timestamp");
                             chat.setTimestamp(timestamp);
 
+                        }
+                        if (valuesInMap.containsKey("lat")){
+                            String lat= (String) valuesInMap.get("lat");
+                            chat.setLat(lat);
+                        }
+                        if (valuesInMap.containsKey("longitude")){
+                            String longitude= (String) valuesInMap.get("longitude");
+                            chat.setLongitude(longitude);
                         }
 
 
@@ -646,6 +668,10 @@ private void getPermission(){
         });
         builder.show();
     }
+    private void takePhotoFromCamera() {
+        Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+        startActivityForResult(intent, TAKE_PICTURE_CAMERA);
+    }
     public void cropImagefromGallary(){
     }
 
@@ -734,7 +760,7 @@ private void getPermission(){
                         hashMap.put("mapview", mapview_url_for_uploade);
                         hashMap.put("timestamp",getTimeStamp());
                         hashMap.put("lat", mlatitude);
-                        hashMap.put("long",mLongitude);
+                        hashMap.put("longitude",mLongitude);
                         reference.child("messages").push().setValue(hashMap);                    }
                 }
 
@@ -772,10 +798,10 @@ private void getPermission(){
                         HashMap<String, Object> hashMap = new HashMap<>();
                         hashMap.put("sender", userId);
                         hashMap.put("receiver", selectedUser.getId());
-                        hashMap.put("mapview", mapview_url_for_uploade);
+                        hashMap.put("imageUrl", mapview_url_for_uploade);
                         hashMap.put("timestamp", getTimeStamp());
                         hashMap.put("lat", mlatitude);
-                        hashMap.put("long", mLongitude);
+                        hashMap.put("longitude", mLongitude);
                         reference.child("messages").push().setValue(hashMap);
                         Toast.makeText(ChatActivity.this,"Your current location sent",Toast.LENGTH_LONG).show();
                     }
