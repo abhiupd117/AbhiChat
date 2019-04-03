@@ -296,6 +296,8 @@ public class RegisterUserAcitivity extends AppCompatActivity {
                         {
                             Log.d(TAG, "Something wrong with user photo String link which is coming from DB");
                         }
+
+
                     }
                 });
 

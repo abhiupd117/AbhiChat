@@ -13,6 +13,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.amandeep.abhichat.ImageActivity;
+import com.amandeep.abhichat.MapViewActivity;
 import com.amandeep.abhichat.Model.Chat;
 import com.amandeep.abhichat.R;
 import com.amandeep.abhichat.StartActivity;
@@ -114,7 +116,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
                     public void onClick(View v) {
                       //  Toast.makeText(mcontext, "i am pure image", Toast.LENGTH_LONG).show();
                         if(chat.getLat()!=null && chat.getLongitude()!=null){
-                            Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse("http://maps.google.com/maps?q=loc:" + chat.getLat() + "," + chat.getLongitude()));
+                          /*  Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse("http://maps.google.com/maps?q=loc:" + chat.getLat() + "," + chat.getLongitude()));
                             i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); // Only if initiating from a Broadcast Receiver
                             String mapsPackageName = "com.google.android.apps.maps";
 
@@ -126,9 +128,17 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
                                 mcontext.startActivity(i);
                             }else{
                                 Toast.makeText(mcontext,"No Map application is installed",Toast.LENGTH_SHORT).show();
-                            }
+                            }*/
+                            Intent intent = new Intent(mcontext, MapViewActivity.class);
+                            intent.putExtra("latitude",chat.getLat());
+                            intent.putExtra("longitude",chat.getLongitude());
+                            intent.putExtra("type","chat_click");
+                            mcontext.startActivity(intent);
 
-
+                        }else{
+                            Intent intent = new Intent(mcontext, ImageActivity.class);
+                            intent.putExtra("image_path",chat.getMessage_img());
+                            mcontext.startActivity(intent);
                         }
                     }
                 });

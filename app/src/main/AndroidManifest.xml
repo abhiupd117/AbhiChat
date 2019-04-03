@@ -32,11 +32,16 @@
         <activity android:name=".RegisterUserAcitivity" />
         <activity android:name=".UserLoginActivity" />
         <activity android:name=".StartActivity">
+
             <intent-filter>
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity android:name=".VideoviewPly"></activity>
+        <activity android:name=".MapViewActivity"/>
+        <activity android:name=".ImageActivity"/>
+        <meta-data android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyANXJoo1l8XgxkvnBACcMY4entGGnFT8Q4"/>
     </application>
 
 </manifest>
