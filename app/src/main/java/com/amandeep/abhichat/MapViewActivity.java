@@ -17,6 +17,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -36,7 +37,7 @@ import java.io.OutputStream;
 import java.net.URI;
 
 public class MapViewActivity extends AppCompatActivity implements OnMapReadyCallback, View.OnClickListener {
-    LatLng currentLatLng;
+    private LatLng currentLatLng;
     private Button btnSend;
     private Bitmap mapBitmap;
     private Uri mapURI;
@@ -129,8 +130,13 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
         switch (v.getId()){
             case R.id.btnSend:
                 //ChatActivity.mapviewImagetoStorage(mapURI);
-                ChatActivity.savemapView(mapBitmap);
-                finish();
+                if(mapBitmap!=null){
+                    ChatActivity.savemapView(mapBitmap);
+                    finish();
+                }else{
+                    Toast.makeText(this,"No Location found",Toast.LENGTH_SHORT).show();
+                }
+
                 break;
         }
     }
