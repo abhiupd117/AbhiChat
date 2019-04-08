@@ -244,7 +244,7 @@ public class ChatActivity extends AppCompatActivity {
                     String msg = message_write.getText().toString();
                     if (!msg.equals("")) {
 //                    Toast.makeText(context,"Receiver = "+fuser.getUid()+" = name = "+fuser.getDisplayName(),Toast.LENGTH_SHORT).show();
-                        sendMessage(userId, selectedUser.getId(), msg);
+                            sendMessage(userId, selectedUser.getId(), msg);
                         Log.e("UserID", userId);
                         message_write.setText("");
                     } else {

@@ -15,9 +15,9 @@ public class Users implements Serializable {
     {
 
     }
-    public Users(String imageurl,String username, String name,String id)
+    public Users(String image_url,String username, String name,String id)
     {
-        this.image_url=imageurl;
+        this.image_url=image_url;
         this.name=name;
         this.username=username;
         this.id=id;
@@ -28,7 +28,7 @@ public class Users implements Serializable {
     }
 
     public void setImageurl(String imageurl) {
-        this.image_url = imageurl;
+        this.image_url = image_url;
     }
 
     public String getUsername() {
