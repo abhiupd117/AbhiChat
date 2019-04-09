@@ -27,6 +27,7 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.amandeep.abhichat.AppUtils.Constant;
+import com.amandeep.abhichat.AppUtils.MyAppPref;
 import com.amandeep.abhichat.Model.Users;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -43,6 +44,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Logger;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
@@ -126,10 +129,10 @@ public class RegisterUserAcitivity extends AppCompatActivity {
         rCreteAccountbtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String user_name = rUserName.getText().toString();
-                String user_mail = rUserMail.getText().toString();
-                String password = rUserPassword.getText().toString();
-               String imageURI=userPhotoStringLink;
+                final String user_name = rUserName.getText().toString();
+                final String user_mail = rUserMail.getText().toString();
+                final String password = rUserPassword.getText().toString();
+               final String imageURI=userPhotoStringLink;
                Log.e("Uploaded image url = ",userPhotoStringLink);
 
 
@@ -140,8 +143,30 @@ public class RegisterUserAcitivity extends AppCompatActivity {
                     progressDialog.setMessage("wait while creating yout account");
                     progressDialog.show();*/
                    progressDialog.setMax(100);
-                    register_user(user_name, user_mail, password,imageURI);
-                    Log.d(TAG, "profile created");
+
+                    FirebaseInstanceId.getInstance().getInstanceId()
+                            .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                                @Override
+                                public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                                    if (!task.isSuccessful()) {
+                                        Log.w(TAG, "getInstanceId failed", task.getException());
+                                        return;
+                                    }
+
+                                    // Get new Instance ID token
+                                    String token = task.getResult().getToken();
+
+                                    // Log and toast
+                                   // String msg = getString(R.string.msg_token_fmt, token);
+                                    Log.d(TAG, token);
+
+                                    register_user(user_name, user_mail, password,imageURI,token);
+                                    Log.d(TAG, "profile created");
+                                   // Toast.makeText(MainActivity.this, msg, Toast.LENGTH_SHORT).show();
+                                }
+                            });
+
+
 
 
                 } else {
@@ -178,7 +203,7 @@ public class RegisterUserAcitivity extends AppCompatActivity {
                 });
     }
 
-    private void register_user(final String user_name, final String user_mail, String password, final String imageURI)
+    private void register_user(final String user_name, final String user_mail, String password, final String imageURI, final String token)
     {
         mAuth.createUserWithEmailAndPassword(user_mail, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
@@ -190,7 +215,7 @@ public class RegisterUserAcitivity extends AppCompatActivity {
                     HashMap<String, String>  userMap= new HashMap<>();
                     userMap.put("name",user_name);
                     userMap.put("email",user_mail);
-
+                    userMap.put("device_token",token);
                     userMap.put("image_url", imageURI);
 
                     mDatabase.setValue(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -200,6 +225,10 @@ public class RegisterUserAcitivity extends AppCompatActivity {
                             if (task.isSuccessful())
                             {
                               //  progressDialog.dismiss();
+
+                                MyAppPref myAppPref = new MyAppPref(context);
+                                myAppPref.setAccessToken(token);
+
                                 Intent mainIntent = new Intent(RegisterUserAcitivity.this, MainActivity.class);
                                 startActivity(mainIntent);
                                 finish();

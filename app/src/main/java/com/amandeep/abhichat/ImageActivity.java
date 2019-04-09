@@ -16,7 +16,7 @@ public class ImageActivity extends AppCompatActivity {
         setContentView(R.layout.image_layout);
         imageView = findViewById(R.id.image);
         if (getIntent().getStringExtra("image_path")!=null) {
-            Glide.with(this).load(getIntent().getStringExtra("image_path")).apply(new RequestOptions().override(200, 100)).fitCenter().into(imageView);
+            Glide.with(this).load(getIntent().getStringExtra("image_path"))/*).apply(new RequestOptions().override(200, 100)).fitCenter()*/.into(imageView);
         }
     }
 }

@@ -24,6 +24,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -81,7 +82,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
         final Chat chat = mChat.get(position);
         //  imageUrl=chat.getImagemessgae();
         if (chat.getMessage_img()!=null){
-            Glide.with(mcontext).load(chat.getMessage_img()).apply(new RequestOptions().override(200,100)).fitCenter().into(viewHolder.image_messge);
+            Glide.with(mcontext).load(chat.getMessage_img()).apply(new RequestOptions().override(200,200)).into(viewHolder.image_messge);
             viewHolder.mTimeStamp.setText(convertTimeStamp(chat.getTimestamp()));
         }
         if (chat.getMessage()!=null) {
@@ -90,6 +91,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
 
         }
         if (chat.getVideoUrl()!=null){
+            viewHolder.video_player_icon.setVisibility(View.VISIBLE);
             if (chat.getMessage_img()!=null){
                 viewHolder.image_messge.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -159,7 +161,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
 
         public TextView show_msg;
         public ImageView profileimage;
-        public ImageView image_messge;
+        public ImageView image_messge,video_player_icon;
         private TextView mTimeStamp;
 
 
@@ -168,6 +170,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
             show_msg = itemView.findViewById(R.id.show_message);
             profileimage = itemView.findViewById(R.id.profile_img);
             image_messge = itemView.findViewById(R.id.iv_show_gallary_image);
+            video_player_icon = itemView.findViewById(R.id.video_player_button);
             mTimeStamp=itemView.findViewById(R.id.time_stamp);
 
 
@@ -204,7 +207,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
     private String convertTimeStamp(String timeStamp){
         long longTemp=Long.parseLong(timeStamp);
         Date d = new Date((long)longTemp*1000);
-        DateFormat f = new SimpleDateFormat("hh:mm:a");
+        DateFormat f = new SimpleDateFormat("hh:mm a");
         System.out.println(f.format(d));
 
         return f.format(d);

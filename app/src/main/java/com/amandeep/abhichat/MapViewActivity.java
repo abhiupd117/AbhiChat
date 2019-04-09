@@ -104,7 +104,7 @@ public class MapViewActivity extends AppCompatActivity implements OnMapReadyCall
                         bitmap = snapshot;
                         try {
                             FileOutputStream out = new FileOutputStream("/mnt/sdcard/Download/TeleSensors.png");
-                            bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
+                            bitmap.compress(Bitmap.CompressFormat.PNG, 50, out);
                             Bitmap resizedBitmap = Bitmap.createScaledBitmap(
                                     bitmap, 400, 400, false);
                             mapBitmap =resizedBitmap;

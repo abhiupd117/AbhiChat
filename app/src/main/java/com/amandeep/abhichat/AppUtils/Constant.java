@@ -7,5 +7,6 @@ public class Constant {
     public static final String IMAGES_MESSAGES="image_messages/";
     public static final String VIDEO_MESSAGES="messages_movies/";
     public static final String VIDEO_FRAME_IMAGE="video_frame_images/";
+    public static final String LEGACY_SERVER_KEY ="AIzaSyBUmn5MI2KyuJ0562_BCVu1-o4Ba22mrJI";
 
 }

@@ -23,8 +23,12 @@
           }
         },
         {
-          "client_id": "269761860327-hdsn4n5c1dsr3220gcgover6rdr6vk9d.apps.googleusercontent.com",
-          "client_type": 3
+          "client_id": "269761860327-afkjqdc6mqsgv7ftnj4bo59pf8hv4rli.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.amandeep.abhichat",
+            "certificate_hash": "f08fd8c346863ce4fddee36f153569bcc12641bc"
+          }
         }
       ],
       "api_key": [
@@ -33,20 +37,13 @@
         }
       ],
       "services": {
-        "analytics_service": {
-          "status": 1
-        },
         "appinvite_service": {
-          "status": 2,
           "other_platform_oauth_client": [
             {
               "client_id": "269761860327-hdsn4n5c1dsr3220gcgover6rdr6vk9d.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
-        },
-        "ads_service": {
-          "status": 2
         }
       }
     }
